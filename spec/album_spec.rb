@@ -1,5 +1,4 @@
-require('rspec')
-require('album')
+require('spec_helper')
 
 describe '#Album' do
   before(:each) do
