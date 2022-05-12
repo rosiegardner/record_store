@@ -4,6 +4,9 @@ require('./lib/album')
 require('./lib/song')
 require('pry')
 also_reload('lib/**/*.rb')
+require("pg")
+
+DB = PG.connect({:dbname => "record_store"})
 
 get('/test')do
   @something = "this is the @something variable"
