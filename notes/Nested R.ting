@@ -1,0 +1,71 @@
+---------------- NESTED ROUTING ---------------
+
+ - Terminology 
+
+ -> Nested Routing:
+  -- When we create routes that depict a "belongs to" relationship.
+
+ -> One-to-many relationship: 
+  -- When many instances of an object belong to one instance of another object.
+  For instance, in first grade a 'Teacher' could many 'Student's but 'Student's would have only one 'Teacher'.
+
+ -> Many-to-many relationship:
+  -- When many instances of an object can belong to many instances of another object.
+  For instance, in high school a 'Teacher' could have many 'Student's and 'Student's could also have many 'Teacher's.
+
+  EXAMPLE: Nested Routes!
+
+  HTTP verb || Route || CRUD Action || Description || URL
+
+> GET - /albums/:id/songs - READ - Get a list of all the songs on an album. - 'www.bestundergroundrecords.com/albums/72/songs'          
+
+> GET - /albums/:id/songs/:song_id - READ - Look at the detail page for a single song. - 'www.bestundergroundrecords.com/albums/72/songs/51'
+                                                           
+> POST - /albums/:id/songs - CREATE - Add a new song to an album - 'www.bestundergroundrecords.com/albums/72/songs'
+
+> PATCH - /albums/:id/songs/:songs_id - UPDATE - Update a single song. - 'www.bestundergroundrecords.com/albums/72/songs/51'
+          
+> DELETE - /albums/:id/songs/:songs_id - DELETE - Delete a song from an album - 'www.bestundergroundrecords.com/albums/72/songs/51'
+
+||||||||||||||||| 
+
+>  - Our record store now has routing for albums, which is a good start, but most applications have more complicated routing.
+ - We'll add songs to our albums to demonstrate. Keep in mind that this is often a difficult concept at first. It may take a few weeks for nested routing to clock but it should make much more sense by the time we begin working with Rails.
+
+> Each album can have many songs and each song will belong to an album.
+
+  -> This is known as a 'one-to-many' relationship 
+   - Adding artists is more complicated because an artist can have many albums 
+     and an album can have many artists which is.....
+     ...... 
+  -> Known as a 'many-to-many' relationship. 
+
+  -In order to properly reflect this one-to-many relationship in our application, we'll use 'nested routing'. 
+  'Visit reference above to look at the routes we could use for adding song CRUD functionality.'
+
+  -- It should be clear why these are called nested routes; 
+  - Songs are nested inside of albums and can only be accessed within the context of an album.
+   -- By nesting songs within albums, we ensure that songs will always have access to a specific album's id - 
+      this makes it easier to associate songs and albums in our mock database (and eventually real databases as well).
+    
+    ! This type of routing is commonly used in Rails, too, which is a key reason why we are exploring it further now. !
+    
+    -- There are several advantages to this kind of routing. Here are a few:
+     
+     -> The routes are self-explanatory. 
+      - It's clear from the routes above that songs should belong to albums.
+        Having consistent naming like this makes our code easy to read and understand.
+    
+     -> By nesting songs withing albums, we ensure we will always have access to an album's id.
+      - This makes it easy to associate an album with a song. 
+        The reason for this will become clear in the this lesson.
+
+  !!! There are also disadvantages to this kind of routing as well. !!!
+    - Nested routes can quickly become DIFFICULT to work with, especially when the routes are more than two layers deep.
+      For instance, it would be challenging to work with a route like
+      ' albums/:id/songs/:id/lyrics/:id. '
+    
+    !! THIS IS CONSIDERED A CODE SMELL AND SHOULD BE AVOIDED !!
+
+---- visit' Backend - CRUD notes -------
+      

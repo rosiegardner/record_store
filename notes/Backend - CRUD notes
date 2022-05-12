@@ -1,0 +1,286 @@
+CRUD FUNCTIONALITY 
+
+ACTION || METHOD || CLASS OR INSTANCE || DESCRIPTION
+ 
+CREATE -- .save -- instance method -- We need a method to save a single instance
+of an album to our mock database.
+
+READ -- .all -- class method -- This method will return a list of all albums from our mock database. 
+
+READ -- .find -- class method -- In order to look up more info about a single instance of an album, we'll need to be able to find it from the list of albums. We'll also need our find method for updating and deleting albums as well.
+
+UPDATE -- .update -- instance method -- This method will update a single instance of an album in mock our database.
+
+DELETE -- .delete -- instance method -- This method will delete a single instance of an album from out mock database.
+
+DELETE -- .clear -- class method -- This method will empty our mock database. We'll us this method for testing purposes
+
+ - Methods for Backend logic for Song class -
+
+READ -- .find_album -- class method on 'Song' class -- This will allow us to search '@@songs' for songs that are affiliated with a specific 'album_id'.
+
+READ -- .songs -- instance method in 'Album' class -- This will return all songs that belong to a specific album.
+
+READ -- .album -- instance method in 'Song' class -- This will return a songs' album.
+
+------------BACKEND LOGIC FOR ALBUM CLASS----------------
+
+!!!!! READ:  Backend Logic for Showing All Albums !!!!!
+
+> We're using the class variable "@@albums == hash brackets" to mock a database.
+> We added an initialized method.
+ For sake of simplicity, our albums just have a name. We can add more properties later when building out our application further. We're focusing on core concepts for now.
+
+1) FIRST TEST
+> We add a method to return all of the results from our database. These results will  
+  be returned in the form of an array. 
+ - REMINDER: Album.all returns an array even though we "@@albums" is a hash. The ".  values" method, when called in a HASH, RETURNS an ARRAY
+> GOOD FAIL
+> Since we don't have any albums yet, we expect Album.all to equal an empty array. 
+> Input the code to make it pass : " def self.all @@albums.values end "
+> PASS
+
+!!!!! CREATE: Backend Logic for Creating Albums !!!!!
+
+> We're ready to start adding albums, which means we need a .save method
+
+2) SECOND TEST
+> In our second test, we added nil as a second argument when instantiating each new
+  album. This is because we're about to add another attribute to our initialize  method.
+
+*** GOOD FAIL
+ Out new test is actually covering 2 things. 
+ 1. It tests whether we can save albums to our mock database.
+ 2. It verifies that Album.all works for multiple items.
+-- Generally, we want our test to cover just one thing, but in this case, we're feeding
+   2 birds with 1 scone. 
+
+> Input code for testing.
+
+> We'll imitate a serial ID from a SQL database. 
+-- In a SQL database, each row has a unique ID. A new entry will never have the same 
+   ID as a previous row, even if that previous row has been deleted. 
+    -A concept that we covered in Intermediate JS. Databases can do this in several ways. One is a serial ID where that value always increments.
+
+> We've added a save method as well as functionality to serialize albums in our mock
+  database.
+
+> We add an attribute reader for id and name.
+
+> Our new save method will need a reader method. *attr_reader :id, :name*
+ --We haven't included parentheses for attr readers arguments here. Ruby is often very 
+   flexible  about parentheses  and we can use a space instead to denote an argument.
+
+> We've added a class variable to keep track of total rows and increment the value when
+  an Album is added. **@@total_rows = 0** 
+  -- this is our mock database taking care of bookkeeping for us.
+
+> We've added id as a second parameter
+  -- In our initialize method we add an **@id**  and set its value.
+  -- We've added code to handle the id **@@id = id || @@total_rows += 1**
+  ?? If id has a value, it will become the value of **@id** However, if id is nil, 
+  which is falsy - the value of **@id** will be **@total_rows +=1**. This is VERY important because we don't want a new row to be added to our mock database if an album already has an id!
+
+** quick reminder of what the "||" means in this context since it's an important little
+  feature of Ruby. We're using the "||" to help determine the value that will be assigned to the **@id** variable. 
+   Since there are many situations where a value might evaluate to nil or something else thats falsy - and we might want to run some other code so the value of the assigned variable doesn't end up being falsy, too. 
+  It would really muck up our mock databases if some of the albums had an id attribute to nil.
+ 
+ --pseudocode--
+ EX 1:
+  variable = truthy || do_something 
+  -In this example, the part before || is truthy. This could be a number, string, or anything else thats truthy in Ruby. The value assigned to the variable will be the part before the ||. The code after || won't run.
+
+ EX 2:
+  variable = falsy || do_something 
+  - The value before the || is falsy. There aren't many things that're falsy in Ruby but nil is one of them. If the value before the || is falsy, the part after the || will be executed **do_something** and the value of the variable will be whatever **do_something** returns. 
+
+ --end--  
+**
+> Each value in our hash will be an Album object. In a Ruby application that uses an 
+  actual SQL database, Ruby will "translate" a SQL row into a Ruby object so it can properly be handled in the application.
+   By making each hash value a Ruby object, we are somewhat imitating this process -- 
+  When we retrieve an album from our mock database, it will already be a Ruby object.
+  This is actually really IMPORTANT! after all, if they aren't Album objects, we won't be able to call Album methods on them.
+   This should also clarify why we have **@id = id || total_rows += 1**. Otherwise we'd be incrementing our id every time an album is saved in our mock database.
+   -However, we've already instantiated a new Album before calling our save method, which means we'd be incrementing the id twice each time we create & save a new album.
+  The save method itself is relatively simple. We instantiate a new album object thats holds the albums * *name & id* *. We could also store other values here, such as cost of album, year released, etc...
+   -NOTE, we don't need to use self in this method; for instance, we could say...
+   "@@albums[id]" instead of "@@albums[self.id]" because Ruby can understand an implicit instead of an explicit self. However, this can be confusing ~for new developers. 
+   It's best to just include self for now.
+
+> Run test..
+**** TEST FAILS! :(
+  :reference back to lesson 10 "Overriding the Equality Operator for testing":
+  -Because these are 2 different objects, Ruby doesn't know they are supposed to be the same album.
+  --We will overwrite the "==" operator. 
+
+> Run test ... PASS! :)
+
+> Now, Switch the the order of tests around so that our "#save" method is tested first.
+ -run test again..
+ -FAIL! - because "@@albums" is no longer empty. The value of "@@albums" is persisting and isn't cleared.
+
+
+!!!!! DELETE: Clearing All Albums !!!!!
+
+> We need a method that will clear "@@albums" between each test. 
+
+3) THIRD TEST!
+
+> Input test..
+> Input method..
+> Run test...
+ **** TEST FAILS! :(
+   -Our "Album.clear()" method just needs to reset the value of "@@albums" to an empty hash. We also reset "@@total_rows" as well.
+
+   --In order to actually get our new test to pass, we need to actually CLEAR our mock database between each test!
+   :Reference back to lesson 10 "Clearing our Mock Database before each test."
+   - SPEC file //// before(:each)do 
+
+> Update our Spec file.
+
+> Run test...PASS! :)
+
+!!!!! READ: Backend Logic for Locating a Specific Album !!!!!
+
+> We're ready to create a ".find()" method!
+ - This method will allow us to locate a specific album, and to route to the albums specific detail once we connect our backend logic to our Record Store Applications - using Sinatra.
+ -- Currently, albums just have a name, but in a real world application, it would be typical for the album's detail page to include more information such as album Art, Track list, and perhaps a summary.
+
+ *This method will also be necessary for UPDATING or DELETING a Specific Album as well*
+
+> Input test
+> Input method
+> Run test...PASS! :)
+ 
+ - Once again, Using a hash makes this easy, All we need is to find the corresponding key in the hash. As a counterpoint, if we stored our albums in an array instead, we'd have to iterate through the array until we found the correct album. That's slow and involves extra code.
+ 
+ *Hashes are awesome & it's super-fast & easy to add, remove, & find key-value pairs*
+
+!!!!! UPDATE: Backend Logic for Updating an Album !!!!!
+
+> We're ready to add a test for our "#update.()" method. 
+ - This method will update a Specific Album!
+
+> Input test
+> Input method
+> Run test...PASS :)
+
+ - We start by creating a new album. Then we save and update it.
+ - The name should be changed accordingly.
+
+ *Updating the album is as simple as just updating the value of the instance variable @name*
+
+!!!!! DELETE: Backend Logic for Deleting an Album !!!!!
+
+> Finally, we need a "#delete()" method for deleting single instance of an "Album"
+
+> Input test
+> Input method
+> Run test...PASS :)
+
+ - We create 2 albums and then delete 1 of them. 
+  Why not create just 1 album? 
+   - The problem with doing that is we wouldn't be able to verify that our "delete()" method isn't inadvertently deleting ALL of our albums.
+ 
+ *Once again, Rubys Hash class provides a handy method for us: a built-in "delete()" method that removes a key-value pair*
+
+---------CHEAT SHEET GENERAL SET UP--------------
+
+> Mock Database
+ - We can create a mock database in a class like this -
+  (@@albums is the mock database  - it is just a class variable):
+ 
+  class Album
+    @@albums = {}
+  end
+
+> .all Method
+ - We can use a basic hash method to retrieve values from our mock database for an
+  Album.all() method:
+
+   def self.all
+    @@albums.values()
+  end
+
+> #save Method
+ - To mock saving records in a database, we need to add a row number (the id of a
+  record) when it is saved:
+
+  class Album
+    attr_reader :id, :name #Our new save method will need reader methods.
+    ...
+    @@total_rows = 0 # We've added a class variable to keep track of total rows and increment the value when an Album is added.
+
+  def initialize(name, id) # We've added id as a second parameter.
+    @name = name
+    @id = id || @@total_rows += 1  # We've added code to handle the id.
+  end
+
+  def save
+    @@albums[self.id] = Album.new(self.name, self.id)
+  end
+end
+
+> .clear Method
+ - We need a method to clear all records in our mock database (for testing purposes):
+  
+  def self.clear
+    @@albums = {}
+    @@total_rows = 0
+  end
+
+> .find Method
+ - We need to be able to search our mock database to find a specific record:
+   
+  def self.find(id)
+    @@albums[id]
+  end
+
+> #update Method
+ - We need to be able to update specific records in our mock database:
+  
+  class Album
+  attr_accessor :name 
+  (# Any field we want to update needs to have read/write with attr_accessor.)
+
+  ...
+
+  def update(name)
+    self.name = name
+    @@albums[self.id] = Album.new(self.name, self.id)
+  end
+
+> #delete Method
+ - We also need to be able to delete a specific record. We can just use a built-in
+  hash method:
+
+  class Album
+    ...
+    def delete
+      @@albums.delete(self.id)
+    end
+  end
+  
+------------------- BACKEND LOGIC FOR SONG CLASS ----------------
+ - reference top of page CRUD functionality for new methods added.
+
+  Albums || (@@albums hash) 
+   -id-     -name- 
+  -> 1   -  "Giant Steps"
+  -> 2   -  "Blue"  
+
+  Songs || (@@songs hash)
+   -id-      -name-
+  -> 1   -  "California"
+  -> 2   -  "Naimia"
+  -> 3   -  "All I Want"
+  -> 4   -  "Mr. P.C."
+
+ - Here we have two (2) "tables" in our mock database. 
+  -> In a SQL database, they actually will be tables.
+   
+   - Now, if we want to find all the songs that belong to "Giant Steps".
+     we just need to look for songs that have an album_id that match the id of "Giant Steps",
+

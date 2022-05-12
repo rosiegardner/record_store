@@ -1,0 +1,51 @@
+# Em-bed-ded R u b y (.erb)
+
+# > Notes for pg. #15 - routing w/ ruby  
+#  - We'll be using a Ruby template engine called "Embedded Ruby" (erb) to combine
+#   ruby code with HTML.
+
+#   *ERB is also commonly used with Rails so we'll be using it regularly for the rest of the Ruby/Rails module*
+
+# !!!!! EMBEDDED RUBY !!!!!  
+
+# > Embedded Ruby processes combined Ruby/HTML, translating it to pure HTML so it can 
+#  be used in the browser.
+#  ~ example 1: HTML with Ruby! "<% %>"
+  
+#    < h1>A List of Favorite Things< /h1>
+#     < ul>
+#       <% @things.each do |thing| %>
+#         < li><%= thing.name %>< /li>
+#       <% end %>
+#     < /ul>
+
+#   We can use HTML normally in an ERB file.  
+
+#   ~ example 2: A simple loop and renders the name of each thing in a list of things.
+
+#    <% @things.each do |thing| %>
+#      <%= thing.name %>
+#    <% end %>
+
+#    We've removed the < li> to reduce it to ERB and Ruby Elements. 
+
+#   *ERB uses the following tags to denote Ruby code: "<% %>"*
+    
+#   > " <% %> "
+#    - These are called *EXECUTION TAGS*
+#     *They should be used for code that will NOT be rendered onscreen*
+
+#     ~ <% @things.each do |thing| %>  is an example. It's code we want to execute but it doesn't result in an expression.
+
+#   > " <%= %> "
+#    - These are *EXPRESSION TAGS*
+#     *We'll use them when we want to render the result of an expression*
+
+#     ~ For instance, we'll want " <%= thing.name %> " to render; otherwise, the names of our favorite things *WILL NOT* show up on screen.
+
+#   **There are a few other ERB tags, but these two are the MOST COMMON and the only  ones we will need**
+
+  
+
+
+     

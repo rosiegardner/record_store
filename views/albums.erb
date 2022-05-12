@@ -1,0 +1,23 @@
+<h1>All Sales Vinyl</h1>
+
+<h3>Available Records</h3>
+
+<% if @albums.any? %>
+  <ul>
+  <% @albums.each do |album_from_array| %>
+    <li><a href="/albums/<%= album_from_array.id %>"><%= album_from_array.name %></a></li>
+  <% end %>
+  </ul>
+<% else %>
+  <p>There are currently no records to display.</p>
+<% end %>
+
+<a href="/albums/new">Add a new album</a>
+
+<form action="/results" method="post"> 
+  <div class="form-group">
+    <label for="search">Search</label>
+    <input id="search" name="search" class="form-control" type="text">
+  </div>
+  <button type="submit" class="btn">Go!</button>
+</form>

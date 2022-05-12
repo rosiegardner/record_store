@@ -1,0 +1,291 @@
+--pg.16------- Adding a layout view ---1 // 24------
+
+Adding E R B files to our code:
+> Add "views" folder to root directory of project
+  *Content that the user will see*
+ - "touch layout.erb"
+  *This file will contain HTML that's used in all our views*
+  - Remember to keep our code DRY, so we shouldn't repeat ourselves.
+    *It makes sense to extract repeated code and put it into a single file*
+- All of our views will use the ERB format. 
+ ! Browsers render HTML so we need to use HTML for our views.
+   However, since we're using Ruby we will want access to Ruby variables, loops and so on.
+    *That's why we need the embedded Ruby part*
+
+> Add content to views/layout.erb file.
+ - We've added Bootstrap, a title and so on. This is all basic HTML expect for one line "<%= yield %>"
+ -- "yield" is a *special* Ruby keyword. It's a more advanced Ruby concept... more on that later.
+ ! Remember! "yield" comes from Ruby, NOT Sinatra.
+   -Note: *EXPRESSION* tags "<%= %>" NEED to be used. 
+  !If -EXECUTION- tags are used, NO VIEWS WILL RENDER!
+
+> Now that we've learned about ERB and added a layout.erb
+  file, let's move on to *write a View!*
+ 
+ --pg.17-------- Adding a Basic View ------25 // 49-----
+
+> Writing a view:
+  - First, we'll add some code to our app.rb.
+     (reference lesson to view code)
+    -The first Four lines should look familiar, 
+    We *require* Sinatra, *album*, and *sinatra/reloader*.
+    Out app should also reload ALL Ruby files in *lib* when ANY changes are made to them.
+  
+  -- Look at the new code in our new route! 
+   When a browser makes a *GET* request to "/test", Sinatra will render a view called " whatever.erb " back to the browser.
+
+> cd into "views" directory and make a new file
+ - touch whatever.erb
+ (reference lesson to view code)
+> Start the server ("ruby app.rb" in command line), navigate to "localhost:4567/test"
+ - We'll see  the "whatever" view rendered there.
+ -- Sometimes, we'll want to define a variable in our *route* that is used in our view.
+  *To do this, we have to make a variable an instance variable*
+   (reference lesson to view code) 
+  - Navigate to *localhost:4567/test* to see our variable rendered.
+
+  --Note: A single view can potentially handle any number of Sinatra routes. Our views don't care how a user reaches them. As long as the Sinatra route defines all variables that the view needs 
+   *such as "@ something" in the example, our view will NOT complain*
+   (reference lesson to view code)
+
+--pg.18---------- READ a List of Albums ---------51 // 83---------
+
+ - Here, we'll add a view for ' /albums ' that will loop through and display albums.
+
+> update app.rb (reference lesson to view code) 
+ - Added new code in our 2 routes '/' & '/albums'
+ -- When these routes are reached, Sinatra will call "Album.all" and save the results in an *instance* variable call "@albums".
+ Because "@albums" is an instance variable, we'll be able to use it in the corresponding view.
+  
+  --Note: A local variable like "albums" will NOT be accessible to the view.
+
+  --Note: Both routes can render the same view. In fact, we could have an app with endless routes all rendering the same view -not likely, but possible-. Out code isn't very DRY but we will deal with that later.
+
+> cd into "views" directory and make a new file.
+ - touch albums.erb
+
+>Insert HTML code (reference lesson to view code)
+ - The code "<% if @albums.any? &>" checks to see if there are any albums. Because "@albums" will always be an array, we can use "Array#any?" to check if the array actually contains any albums. 
+  -- If so, we will loop through the albums and display their names.
+  -- If not, we'll let the user know there are currently no albums to display.
+
+!!! 
+ This kind of view logic is very common in an ERB and we'll
+ be using  code that looks like this for -Rails- as well. 
+ The *view* combines both Ruby logic -a loop & a conditional- with standard HTML elements such as headers and lists.
+
+ *We should only ever put view-related logic in our views.Both the conditional and the looping logic in our code located in 'albums.erb' determine what the user should see so they clearly belong here.*
+  -- Note: We don't even call methods like "Album.all" here. 
+   We let 'app.rb' handle that. Instead, relevant information is passed into instance variables so we don't have to call any backend methods.
+  
+  - We also add a new album link in the code 'albums.erb' that tells Sinatra specifically which route the link should hit. Other than that, links look similar to how we've used them in the past. We can still use a full URL to an external site, for instance..
+   *Start the server and navigate to "localhost:4567", we'll get a message saying there are currently no records, which is exactly what we'd expect.*
+!!!
+
+--pg.19------ CREATE a New Album -------85 // 151--------
+
+ - Now that we've created our first view. We still can't actually render a list of albums without adding albums in the first place. We'll do that here.
+
+> Update app.rb (reference lesson to view code)
+ -Our '/albums/new' route just needs to navigate to a view with a form. That's why the route routes to an ERB file and doesn't do anything else.
+
+> cd into 'views' directory and make new file.
+ - touch new_album.erb
+
+> Insert HTML code (reference lesson to view code)
+ - This form has many similarities to forms we created in "Intro to Programming". We have < form> tags w/ < label>, and < input> tags. We also have some basic Bootstrap styling with the *form-group* div class.
+  -- The < input> tag creates a field for user input and it has four attributes: *name, id, class, & type*. 
+   Sinatra identifies our input fields based on the *name* attribute, NOT the *id* attribute. 
+   !! 
+    This is VERY IMPORTANT. While the *id* and *name* attributes will often be named the same in our app's, they are different here to emphasize that Sinatra will grab values based on the *name* attribute. 
+    We'll cover that more in a moment.
+   !!
+
+  ?? When a user clicks the submit button, how does Sinatra know what to do ??
+   - Sinatra will look at the 'form action' and 'form method' and then route the app to the corresponding block in app.rb
+  
+  - Based on the form in 'new_album.erb', the 'form action' is */albums* and the 'form method' is *post*.
+   - Which means Sinatra will look in 'app.rb' for " post'"/albums"' ". If that block doesn't exist, we'll get a "Sinatra doesn't know this ditty" error. This is a common point of confusion for beginners. 
+    --Note: Routes should always being with a '/', but sometimes beginners forget to add the '/' to the 'form action'. 
+   *That will lead to an error, one that can be tough for tired eyes*
+
+> Insert a post /albums route in app.rb 
+ (reference lesson to view code)
+
+> Start the server and add a new album
+ - Poke around with 'pry' in the terminal
+  (reference lesson to view pry input)
+  -- Every route has a 'params' hash. We can look at it by typing in 'params'. 
+  - As we can see, the 'album_name' field from our form is showing up. It's a *key-value* pair with the key being the *name* attribute from the form field and the value being the user input. 
+   -- 'params' acts like any other Ruby hash. There are multiple ways to access values including bracket notation and the 'Hash#fetch' method. If we try to fetch a value based on a *non-existent* key, we'll git 'nil'.
+   !!
+    That is another important gotcha - 
+    *if a key from 'params' isn't properly typed in, it will lead to errors.*
+   !! 
+
+ - Now that we have a 'name' for an album, we just need to apply some 'Album' to the route.
+
+> Update post /albums route in app.rb
+ (reference lesson to view code)
+ - Now we can add new albums and then navigate to the root route and see them populate.
+ !! 
+  However, this route just ends up with a blank page. We have to physically navigate to the root route in order to see the list of albums. That's because *we haven't called the ERB method to render a view.* 
+ !!
+  ?? 
+   Which view should this route render? We currently have   two views and either would be fine - we could render the list of all albums or we could route back to the form so it's easy to add more albums.
+  ??
+  - We'll go ahead and route back to '/albums'.
+
+> Update code in post /albums route - erb method.
+ (reference lesson to view code)
+
+ -- ?? NOMethodERROR at /albums ??
+  - This is because our *albums* view expects the route to have an *instance* variable name '@albums'. 
+  - We need to define '@albums' in our route
+
+> Update post /albums route - define @albums
+ (reference lesson to view code)
+ -Now we can both view and add new albums.
+  -- Note: When we refresh the page, we won't lose our list of 'albums'. That's because the server is still running. 
+  When we restart the server, all the albums will be cleared.
+
+--pg.20---------- GET versus POST -----152 // 207-------
+
+ - So far, we've created a form that uses a POST request. 
+  If we wanted to, we could've used a GET request instead.
+   However, it wouldn't be a good idea. We'll go over the difference between the two types of requests and when we might use GET versus POST in our forms.
+
+ - Let's add a new form to our app to demonstrate the difference. Specifically, we'll add a form for searching albums because this is a common use case for using GET in a form. 
+  -- Note: we won't actually build out all search functionality 
+   - instead, that will be an optional objective in the next classwork project.
+
+> Update views/albums.erb form
+  (reference lesson to view code.)
+  - make note of where you place this code.
+
+> Add 'binding.pry' to get /albums in app.rb
+ - poke around with pry in the terminal
+ -- We have a *key-value* pair with a 'search' key. 
+   So far, everything looks the same as our form with a POST request.
+   - Now, exit pry and check the URL:
+   'http://localhost:4567/albums?search=in+rainbows'
+
+  - The Parameters we submitted are being passed through the URL.
+    That's great for a search form but not very secure. For instance, if we needed to submit personal data about ourselves, 
+    *we wouldn't want to pass that data through the URL*. Anyone monitoring our app's web traffic would see it. 
+    It's common for sites to cache URLs and we wouldn't want our bank account numbers stored in a URL where malicious users could find them.
+  
+  - Let's take a closer look at how our forms are different by opening Chrome Developer Tools and Clicking on "Network".
+
+> Open Dev Tools in chrome and click "Network" in the browsers console.
+ (reference lesson to view example)
+ -> '-remove pry-'
+ -> Refresh the page with our search form.
+  - A Network resource will be showing.
+  - This is our request.
+ -> Click on the Network resource that was just opened and click on "Headers". 
+  - This shows a 'GET' request with our search field. We can see the query parameter in the URL & we can also see it in the *Query String Parameters* section of the Network tab.
+  -- !Reference lesson to view example of POST request in Network tab when adding a new album!
+   - Note: the POST request has additional response and request headers and the form parameters are passed through via form data, not through the URL.
+  
+  *Another reason we should favor POST for form data. If a route in our 'app.rb' expects parameters '-such as a name field for an album-', our app will break if a user can simply make a GET request and enter the URL without adding parameters.*
+   - In our case, any time a user or web crawler entered the URL, a new album without a name would be added to our mock database. That would be terrible. It should only be possible to reach the route via a form submission and a POST action.
+
+  !!!
+   In a very general sense, the difference between *GET* and *POST* requests is simple. 
+   We should use a 'GET' request when we're just retrieving data from a server. 
+   However, if we want to *process* data, we should use a 'POST' request.
+  !!!
+
+  - Usually, we'll process data by making some kind of change to a database. 
+   For instance, if we want to sign up for a newsletter, we would..
+   -> Submit a form
+   -> a 'POST' request would be made to a server
+   -> then, a *name* & *email* would be added to a database!
+
+ *Once we start working with databases in the next course section, the difference between 'GET' & 'POST' request will become even clearer.* 
+
+--pg.22---------- READ and Album Detail --------208 // 240 --------
+
+ - We've added logic for showing a LIST of albums & ADDING new albums.
+  - We're ready to add information for showing a specific albums detail info.
+
+> Update get '/albums/:id in app.rb
+ (reference lesson to view code)
+  - This route allows us to pass a parameter into a dynamic URL.
+   --If we pass in 'localhost:4567/albums/12', we can find the specific album with that id. Whenever we want to pass a parameter into the URL, we'll use a :symbol.
+   We could call this :id or :name or something else. 
+   However, *CLEAR AND CONCISE NAMING SHOULD ALWAYS BE PRIORITIZED*
+
+ - Next, we use our *find* method to get a specific album and then save that album in the *instance* variable '@album'
+  -- Note: We need to convert the parameter to an integer because it comes to us in the form of a string. '@album' is now available for use in our view.
+
+!!! We now have *TWO -2-* erb files that are similar. !!!!
+!!! ALBUM.ERB !!! & !!! ALBUMS.ERB !!!
+
+> cd into 'views' directory and make new file
+ - touch album.erb
+> Insert code
+ (reference lesson to view code)
+ - Our album detail page doesn't have much on it.
+  However, a real world application would have images, summaries, and other details that we wouldn't show on our main page.
+  - We also add a link to an album edit view '-which we haven't created yet-'.
+
+> Update code in albumS.erb - NOT album.erb 
+ (reference lesson to view code)
+ - We've made our list of albums clickable.
+ -- We use an *EXPRESSION* tag to pass in the value of an individual album's id.
+  This way, each album has it's own unique link.
+  Now, lets add some functionality next.
+
+--pg.23-------- UPDATE an Album ------------241 // 270------
+
+ - Lets add update functionality to our application. 
+  -- First, we need a route for our edit form.
+
+> Update get '/albums/:id/edit' in app.rb
+ (reference lesson to view code)
+ - This route does the exact same thing as our '/albums/:id' route 
+  - the only difference is that they render *different embedded Ruby files*.
+
+> cd into 'views' directory and make new file
+ - touch edit_album.erb
+
+> Insert code to add a view for our edit form
+ (reference lesson to view code)
+ -- Note: We're using the 'POST' method. Sinatra doesn't have support for 'PUT' - also known as 'PATCH', and 'DELETE' methods so we have to *fake* a 'PUT' request.
+  - We can do this by adding the following line:
+   "< input name="_method" type="hidden" value="patch">"
+  - This specifies that we're using the 'PATCH' method and that the field should be
+  hidden.
+ *The field is hidden because we don't want users to alter it or deal with it.* 
+
+> Update patch '/albums/:id' in app.rb
+ (reference lesson to view code)
+ - It's pretty straight forward, we...
+  -> Find the album
+  -> Update its name
+  -> Save all the albums in a variable
+  -> then, Render 'albums.erb'
+
+--pg.24---------- DELETE an Album ----------271 // --------
+
+ - Finally, it's time to delete an album. 
+  - Let's add a delete button to our view for editing an album.
+
+> Add code to the end of 'edit_album.erb'
+ (reference lesson to view code)
+ - This form is very similar to the code we added for a 'PUT' request. 
+  - The only difference is that we use a value of *'delete'* instead of *'patch'*.
+   We also don't need to have any other form fields - 
+   *Our only goal here is to delete the album entirely*
+
+> Update delete '/albums/:id' in app.rb
+ (reference lesson to view code)
+ - Once again, it's very similar to our code for updating an album. 
+ - The only difference is that we call 'delete' instead of 'update'.
+
+*WE'VE SUCCESSFULLY ADDED ALL CRUD FUNCTIONALITY FOR OUR RECORD STORE!*
+ -It's not much of a record store - not yet, anyway - but all the basic pieces are in a place to build this our further!
+
+   
