@@ -1,31 +1,32 @@
-require('pry')
-
-# Our mock database will be a hash. In addition to being efficient, hashes are a common data structure used in databases. (An array is much more inefficient.) We'll use a class variable for our mock database so any method inside our Album class can access it.
-# Lets consider the methods we'll need to implement CRUD functionality
-
-
 class Album
-  attr_reader :id, :name 
+  attr_reader :id
+  attr_accessor :name
 
-  @@albums = {}
-  @@total_rows = 0 
-
-  def initialize(name, id)
-    @name = name
-    @id = id || @@total_rows += 1 
+  def initialize(attributes)
+    @name = attributes.fetch(:name)
+    @id = attributes.fetch(:id)
   end
 
   def self.all
-    @@albums.values()
+    returned_albums = DB.exec("SELECT * FROM albums;")
+    albums = []
+    returned_albums.each() do |album|
+      name = album.fetch("name")
+      id = album.fetch("id").to_i
+      albums.push(Album.new({:name => name, :id => id}))
+    end
+    albums
   end
 
   def self.clear
-    @@albums = {}
-    @@total_rows = 0
+    DB.exec("DELETE FROM albums *;")
   end
 
   def self.find(id)
-    @@albums[id]
+    album = DB.exec("SELECT * FROM albums WHERE id = #{id};").first
+    name = album.fetch("name")
+    id = album.fetch("id").to_i
+    Album.new({:name => name, :id => id})
   end
 
   def self.search(str)
@@ -34,19 +35,22 @@ class Album
   end
 
   def save
-    @@albums[self.id] = Album.new(self.name, self.id)
+    result = DB.exec("INSERT INTO albums (name) VALUES ('#{@name}') RETURNING id;")
+    @id = result.first().fetch("id").to_i
   end
 
   def ==(album_to_compare)
     self.name() == album_to_compare.name()
   end
 
-  def update(name)
-    @name = name
+  def update(x)
+    @name = x
+    DB.exec("UPDATE albums SET name = '#{@name}' WHERE id = #{@id};")
   end
 
   def delete
-    @@albums.delete(self.id)
+    DB.exec("DELETE FROM albums WHERE id = #{@id};")
+    DB.exec("DELETE FROM songs WHERE album_id = #{@id};")
   end
 
   def songs
