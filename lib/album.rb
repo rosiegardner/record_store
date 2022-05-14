@@ -29,10 +29,10 @@ class Album
     Album.new({:name => name, :id => id})
   end
 
-  def self.search(str)
-    album_search = @@albums.find { |album| album[1].name.downcase == str.downcase }
-    album_search[1] 
-  end
+  # def self.search(str)
+  #   album_search = @@albums.find { |album| album[1].name.downcase == str.downcase }
+  #   album_search[1] 
+  # end
 
   def save
     result = DB.exec("INSERT INTO albums (name) VALUES ('#{@name}') RETURNING id;")
