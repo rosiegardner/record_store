@@ -24,9 +24,13 @@ class Album
 
   def self.find(id)
     album = DB.exec("SELECT * FROM albums WHERE id = #{id};").first
-    name = album.fetch("name")
-    id = album.fetch("id").to_i
-    Album.new({:name => name, :id => id})
+    if album
+      name = album.fetch("name")
+      id = album.fetch("id").to_i
+      Album.new({:name => name, :id => id})
+    else
+      nil
+    end
   end
 
   # def self.search(str)
