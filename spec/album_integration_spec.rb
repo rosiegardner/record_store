@@ -6,20 +6,21 @@ set(:show_exceptions, false)
 describe('create an album path', {:type => :feature}) do
   it('creates an album and then goes to the album page') do
     visit('/albums')
+    # save_and_open_page # similar to binding.pry
     click_on('Add a new album')
     fill_in('album_name', :with => 'Yellow Submarine')
     click_on('Go!')
-    expect(page).to have_content('Yellow Submarine')
+    expect(page).to(have_content('Yellow Submarine'))
   end
 end
 
 describe('create a song path', {:type => :feature}) do
   it('creates an album and then goes to the album page') do
-    album = Album.new("Yellow Submarine", nil)
-    album.save
+    album = Album.new(:name => "Yellow Submarine", :id => nil)
+    album.save()
     visit("/albums/#{album.id}")
     fill_in('song_name', :with => 'All You Need Is Love')
     click_on('Add song')
-    expect(page).to have_content('All You Need Is Love')
+    expect(page).to(have_content('All You Need Is Love'))
   end
 end
