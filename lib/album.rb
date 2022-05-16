@@ -33,34 +33,33 @@ class Album
     end
   end
 
-  # def self.search(str)
-  #   album_search = @@albums.find { |album| album[1].name.downcase == str.downcase }
-  #   album_search[1] 
-  # end
-
   def save
     result = DB.exec("INSERT INTO albums (name) VALUES ('#{@name}') RETURNING id;")
     @id = result.first().fetch("id").to_i
   end
-
+  
   def ==(album_to_compare)
     self.name() == album_to_compare.name()
   end
-
+  
   def update(x)
     @name = x
     DB.exec("UPDATE albums SET name = '#{@name}' WHERE id = #{@id};")
   end
-
+  
   def delete
     DB.exec("DELETE FROM albums WHERE id = #{@id};")
     DB.exec("DELETE FROM songs WHERE album_id = #{@id};")
   end
-
+  
   def songs
     Song.find_by_album(self.id)
   end
-
- 
-
+  
+  # def self.search(str)
+  #   album_search = @@albums.find { |album| album[1].name.downcase == str.downcase }
+  #   album_search[1] 
+  # end
+  
+  
 end
