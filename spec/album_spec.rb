@@ -6,7 +6,7 @@ describe '#Album' do
     it("saves an album") do
       album = Album.new({:name => "Giant Steps",:id => nil}) # nil added as second argument
       album.save()
-      album2 = Album.new({:name => "Blue",:id => nil}) # nill added as second argument
+      album2 = Album.new({:name => "Blue",:id => nil}) 
       album2.save()
       expect(Album.all).to(eq([album, album2]))
     end
@@ -79,6 +79,31 @@ describe '#Album' do
     end
   end
 
+  describe('#delete') do
+    it("deletes all songs belonging to a deleted album") do
+      album = Album.new({:name => "A Love Supreme", :id => nil})
+      album.save()
+      song = Song.new({:name => "Naima", :album_id => album.id, :id => nil})
+      song.save()
+      album.delete()
+      expect(Song.find(song.id)).to(eq(nil))
+    end
+  end
+
+  describe('#songs') do
+    it("returns an album's songs") do
+      Album.clear()
+      album = Album.new({:name => "Giant Steps", :id => nil})
+      album.save()
+      song = Song.new({:name => "Naima", :album_id => album.id, :id => nil})
+      song.save()
+      song2 = Song.new({:name => "Cousin Mary", :album_id => album.id, :id => nil})
+      song2.save()
+      expect(album.songs).to(eq([song, song2]))
+    end
+  end      
+  
+  # ----- WIP -----      
   # describe('.search') do
   #   it("searches for an album by album name") do
   #     album = Album.new("Giant Steps", nil)
@@ -92,17 +117,4 @@ describe '#Album' do
   #   end
   # end
 
-  # describe('#songs') do
-  #   it("returns an album's songs") do
-  #     album = Album.new("Giant Steps", nil)
-  #     album.save()
-  #     song = Song.new("Naima", album.id, nil)
-  #     song.save()
-  #     song2 = Song.new("Cousin Mary", album.id, nil)
-  #     song2.save()
-  #     expect(album.songs).to(eq([song, song2]))
-  #   end
-  # end
-
-  
 end
