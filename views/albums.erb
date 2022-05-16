@@ -1,11 +1,11 @@
-<h1>All Sales Vinyl</h1>
+<h1>Morbid Tale Records</h1>
 
 <h3>Available Records</h3>
 
 <% if @albums.any? %>
   <ul>
-  <% @albums.each do |album_from_array| %>
-    <li><a href="/albums/<%= album_from_array.id %>"><%= album_from_array.name %></a></li>
+  <% @albums.each do |album| %>
+    <li><a href="/albums/<%= album.id %>"><%= album.name %></a></li>
   <% end %>
   </ul>
 <% else %>
@@ -13,6 +13,11 @@
 <% end %>
 
 <a href="/albums/new">Add a new album</a>
+<br>
+<h3>Artist</h3>
+<a href="/artists">Available Artists</a>
+ <br>
+  <br>
 
 <form action="/results" method="post"> 
   <div class="form-group">

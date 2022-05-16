@@ -1,0 +1,19 @@
+<%# show all artists %>
+
+<h1>Morbid Tale Records</h1>
+
+<h2>Available Artists</h2>
+<% if @artists.any? %>
+  <ul>
+    <% @artists.each do |artist| %>
+      <li><a href="/artists/<%= artist.id() %>"><%= artist.name %></a></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>There are currently no artists to display.</p>
+<% end %>
+<form action="/artists/new" method="get">
+  <button type="submit">Add a new artist</button>
+</form>
+
+<p><a href="/">Return to homepage</a></p>

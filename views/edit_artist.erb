@@ -1,0 +1,19 @@
+<%# form for editing an artist %>
+<h1>Update <%= @artist.name %></h1>
+
+<form action="/artists/<%= @artist.id %>" method="post">
+  <input name="_method" type="hidden" value="patch">
+
+  <label for="name">Rename artist</label>
+  <input id="name" name="name" type="text">
+  <label for="album_name">Add album</label>
+  <input id="album_name" name="album_name" type="text">
+  <button type="submit">Update</button>
+</form>
+
+<form action="/artists/<%= @artist.id %>" method="post">
+  <input name="_method" type="hidden" value="delete">
+
+  <button type="submit">Delete Artist</button>
+</form>
+<p><a href="/artists">Return to artist list"</a></p>
