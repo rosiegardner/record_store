@@ -127,11 +127,17 @@ post('/artists') do
   redirect to('/artists')
 end
 
+post('/artists/:id') do
+  @artist = Artist.find(params[:id].to_i())
+  @artist.update({:name => params[:name], :album_name => params[:album_name]})
+  redirect to('/artists')
+end
+
 # update a single album
 patch('/artists/:id') do
   @artist = Artist.find(params[:id].to_i())
   @artist.update(:name => params[:name], :album_name => params[:album_name])
-  redirect to('/artists')
+  erb(:artist)
 end
 
 # delete an album from list
