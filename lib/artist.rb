@@ -24,7 +24,12 @@ class Artist
   end
 
   def ==(artist_to_compare)
-    self.name() == artist_to_compare.name()
+    if artist_to_compare != nil
+      self.name() == artist_to_compare.name
+    else
+      false
+    end
+    # self.name() == artist_to_compare.name()
   end
 
   def self.clear
@@ -69,7 +74,22 @@ class Artist
       name = album.first().fetch("name")
       albums.push(Album.new({:name => name, :id => album_id}))
     end
-    albums
+    if albums.any?
+      albums
+    end
+  end
+
+  def self.search(str)  
+    result = DB.exec("SELECT * FROM artists WHERE name ILIKE '%#{str}%';")
+    artists = []
+    result.each() do |artist|
+      name = artist.fetch("name")
+      id = artist.fetch("id").to_i
+      artists.push(Artist.new({:name => name, :id => id}))
+    end
+    if artists.any?
+      artists
+    end
   end
 
 end
