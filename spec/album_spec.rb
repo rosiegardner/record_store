@@ -63,10 +63,18 @@ describe '#Album' do
     it('updates an album by id') do
       album = Album.new(:name =>'Giant Steps',:id => nil)
       album.save()
-      album.update('A Love Supreme')
-      expect(album.name).to(eq('A Love Supreme'))
+      artist = Artist.new({:name => "John Coltrane", :id => nil})
+      artist.save()
+      album.update(:artist_name => "John Coltrane")
+      expect(album.artists).to(eq([artist]))
     end
   end 
+  # it('updates an album by id') do
+  #   album = Album.new(:name =>'Giant Steps',:id => nil)
+  #   album.save()
+  #   album.update('A Love Supreme')
+  #   expect(album.name).to(eq('A Love Supreme'))
+  # end
 
   describe('#delete') do
     it("deletes an album by id") do
@@ -101,20 +109,29 @@ describe '#Album' do
       song2.save()
       expect(album.songs).to(eq([song, song2]))
     end
-  end      
+  end 
   
-  # ----- WIP -----      
-  # describe('.search') do
-  #   it("searches for an album by album name") do
-  #     album = Album.new("Giant Steps", nil)
-  #     album.save
-  #     album2 = Album.new("Love Supreme", nil)
-  #     album2.save
-  #     album3 = Album.new('Giant Steps', nil)
-  #     album3.save
-  #     expect(Album.search("Giant Steps")).to(eq(album))
-  #     #CHANGED FROM LOWERCASE
-  #   end
-  # end
+  describe('.search') do
+    it("searches for an album by album name") do
+      album = Album.new({:name =>"Lil Porky",:id => nil})
+      album.save
+      album2 = Album.new({:name =>"Love Supreme", :id => nil})
+      album2.save
+      album3 = Album.new({:name =>'Giant Steps', :id => nil})
+      album3.save
+      expect(Album.search("por")).to(eq([album]))  
+    end
+  end
+  
+  describe('#artists') do
+    it('returns all artists related to an album') do
+      album = Album.new(:name => "This is a sweet album", :id => nil)
+      album.save
+      artist = Artist.new(:name => "Cool Artist Person", :id => nil)
+      artist.save
+      album.update(:artist_name => "Cool Artist Person")
+      expect(album.artists).to(eq([artist]))
+    end
+  end
 
 end
