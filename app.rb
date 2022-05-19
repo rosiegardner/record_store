@@ -97,6 +97,9 @@ end
 
 # display results
 post('/results') do
+  name = params[:search]
+  @albums =  Album.search(name)
+  @artists = Artist.search(name) 
   erb(:search_results)
 end
 
